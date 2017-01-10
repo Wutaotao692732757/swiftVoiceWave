@@ -38,15 +38,21 @@ class ViewController: UIViewController {
             // 发生了错误
             print(error.localizedDescription)
         }
-      let url = URL.init(fileURLWithPath: "dev/null")
-//      let dic = Dictionary.init(dictionaryLiteral: 4100,AVSampleRateKey,2,AVNumberOfChannelsKey, NSNumber(kAudioFormatAppleLossless), AVFormatIDKey,NSNumber(AVAudioQuality.max))
-        let rateNub=NSNumber.init(integerLiteral: 4100);
-        let channelNub=NSNumber.init(integerLiteral: 2);
         
-        let dic = [AVSampleRateKey:rateNub, AVNumberOfChannelsKey:channelNub,AVFormatIDKey:kAudioFormatAppleLossless,AVEncoderAudioQualityKey:AVAudioQuality.max] as [String : Any];
+
+      let url = URL.init(fileURLWithPath: "dev/null")
+        
+      let dic2 = [
+            AVFormatIDKey: NSNumber(value: kAudioFormatMPEG4AAC),
+            AVNumberOfChannelsKey: 2, //录音的声道数，立体声为双声道
+            AVEncoderAudioQualityKey : AVAudioQuality.max.rawValue,
+            AVEncoderBitRateKey : 320000,
+            AVSampleRateKey : 44100.0 //录音器每秒采集的录音样本数
+        ] as [String : Any];
         
         do {
-            try recoder =  AVAudioRecorder.init(url: url, settings: dic)
+            try recoder =  AVAudioRecorder.init(url: url, settings: dic2)
+         
         } catch let error as NSError {
             // 发生了错误
             print(error.localizedDescription)
@@ -54,14 +60,8 @@ class ViewController: UIViewController {
         
         
             recoder?.prepareToRecord();
-            recoder?.isMeteringEnabled=true
+            recoder?.isMeteringEnabled=true;
             recoder?.record();
-        
-        
-
-        
-        
-     
         
     }
     
@@ -75,6 +75,8 @@ class ViewController: UIViewController {
         
         decibels=(recoder?.averagePower(forChannel: 0))!;
         
+          let deci2=recoder?.averagePower(forChannel: 0);
+        print("ssss--%f",deci2);
         if (float_t(decibels
             
             )<float_t(minDecibels)) {
@@ -101,13 +103,16 @@ class ViewController: UIViewController {
         //振幅
         let maxHeight:CGFloat = 100.0
         //便宜度数
-        let degree = float_t(0.1)*float_t(count)
+        let degree = float_t(0.2)*float_t(count)
         
         let max = NSInteger(Screew);
         for i in 0...max{
             
             let x:CGFloat = 0.0+CGFloat(i)
-            let y:CGFloat = CGFloat(sinf((float_t(x)/float_t(Screew))*float_t(M_PI*2)-degree)*float_t(maxHeight))*lever
+            //中间高两边低
+            let scaleHeight=CGFloat(sinf((float_t(x)/float_t(Screew))*float_t(M_PI)))
+            let y:CGFloat = CGFloat(sinf((float_t(x)/float_t(Screew))*float_t(M_PI*2)-degree)*float_t(maxHeight))*lever*scaleHeight
+            
             
             if i==0 {
                 path.move(to: CGPoint(x:x,y:400+y))
